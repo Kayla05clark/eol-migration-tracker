@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.name }} — EOL Migration Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            color: #1a1a2e;
+        }
+
+        header {
+            background: #1a1a2e;
+            color: white;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { font-size: 1.3rem; font-weight: 600; }
+
+        .back-link {
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .back-link:hover { color: white; }
+
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+
+        .site-header {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .site-header h2 { font-size: 1.2rem; font-weight: 600; }
+        .site-header p { font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem; }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 99px;
+            font-weight: 500;
+        }
+
+        .badge-sla { background: #fef3c7; color: #92400e; }
+        .badge-milestone { background: #e0e7ff; color: #3730a3; }
+
+        /* Progress */
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 0.35rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: #4f6ef7;
+        }
+
+        .progress-fill.complete { background: #22c55e; }
+        .progress-fill.mid { background: #f59e0b; }
+
+        /* Add Device Form */
+        .add-device-form {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+
+        h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem 0.85rem;
+            border: 1px solid #dde1e7;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            color: #1a1a2e;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4f6ef7;
+            background: white;
+        }
+
+        button[type="submit"] {
+            margin-top: 1rem;
+            padding: 0.65rem 1.5rem;
+            background: #4f6ef7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button[type="submit"]:hover { background: #3a56d4; }
+
+        /* Device Table */
+        .device-table-wrap {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        thead tr {
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.65rem 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f9fafb; }
+
+        /* Status Badge */
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.65rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-in-progress { background: #dbeafe; color: #1e40af; }
+        .status-complete { background: #dcfce7; color: #166534; }
+
+        /* Inline update form */
+        .update-form { display: flex; flex-direction: column; gap: 0.4rem; }
+        .update-form select { font-size: 0.82rem; padding: 0.4rem 0.6rem; }
+        .update-form textarea {
+            font-size: 0.82rem;
+            padding: 0.4rem 0.6rem;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .btn-save {
+            padding: 0.35rem 0.85rem;
+            background: #4f6ef7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 500;
+            align-self: flex-start;
+        }
+
+        .btn-save:hover { background: #3a56d4; }
+
+        .btn-delete {
+            padding: 0.3rem 0.7rem;
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-delete:hover { background: #fecaca; }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>{{ site.name }}</h1>
+    <a href="/" class="back-link">← Back to Dashboard</a>
+</header>
+
+<div class="container">
+
+    <!-- Site Info -->
+    <div class="site-header">
+        <div>
+            <h2>{{ site.name }}</h2>
+            <p>📍 {{ site.location or 'No location set' }}</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            {% if site.milestone %}
+            <span class="badge badge-milestone">🎯 {{ site.milestone }}</span>
+            {% endif %}
+            {% if site.sla_date %}
+            <span class="badge badge-sla">SLA: {{ site.sla_date }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    {% set progress = site.progress() %}
+    <div class="progress-row">
+        <span>Overall Deployment Progress</span>
+        <span>{{ progress }}%</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill
+            {% if progress == 100 %}complete
+            {% elif progress >= 50 %}mid{% endif %}"
+            style="width: {{ progress }}%">
+        </div>
+    </div>
+
+    <!-- Add Device Form -->
+    <div class="add-device-form">
+        <h3>Add New Device</h3>
+        <form action="/site/{{ site.id }}/add-device" method="POST">
+            <div class="form-grid">
+                <input type="text" name="hostname" placeholder="Hostname" required>
+                <input type="text" name="device_type" placeholder="Device Type (Router, Switch, AP)">
+                <input type="text" name="old_model" placeholder="Old Model (EOL)">
+                <input type="text" name="new_model" placeholder="New Model">
+                <input type="text" name="assigned_tech" placeholder="Assigned Technician">
+            </div>
+            <button type="submit">+ Add Device</button>
+        </form>
+    </div>
+
+    <!-- Device Table -->
+    <div class="device-table-wrap">
+        <h3>Devices — {{ devices|length }} total</h3>
+        <br>
+        {% if devices %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Hostname</th>
+                    <th>Type</th>
+                    <th>Old Model</th>
+                    <th>New Model</th>
+                    <th>Technician</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Update</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for device in devices %}
+                <tr>
+                    <td><strong>{{ device.hostname }}</strong></td>
+                    <td>{{ device.device_type or '—' }}</td>
+                    <td>{{ device.old_model or '—' }}</td>
+                    <td>{{ device.new_model or '—' }}</td>
+                    <td>{{ device.assigned_tech or '—' }}</td>
+                    <td>
+                        <span class="status
+                            {% if device.status == 'Complete' %}status-complete
+                            {% elif device.status == 'In Progress' %}status-in-progress
+                            {% else %}status-pending{% endif %}">
+                            {{ device.status }}
+                        </span>
+                    </td>
+                    <td style="max-width: 180px; font-size: 0.82rem; color: #6b7280;">
+                        {{ device.notes or '—' }}
+                    </td>
+                    <td>
+                        <form action="/device/{{ device.id }}/update"
+                              method="POST" class="update-form">
+                            <select name="status">
+                                <option {% if device.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option {% if device.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option {% if device.status == 'Complete' %}selected{% endif %}>Complete</option>
+                            </select>
+                            <textarea name="notes"
+                                      placeholder="Add notes...">{{ device.notes or '' }}</textarea>
+                            <button type="submit" class="btn-save">Save</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/device/{{ device.id }}/delete"
+                              method="POST"
+                              onsubmit="return confirm('Delete this device?')">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            No devices added yet. Add your first device above.
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+</body>
+</html>

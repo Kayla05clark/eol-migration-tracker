@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOL Migration Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            color: #1a1a2e;
+        }
+
+        header {
+            background: #1a1a2e;
+            color: white;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { font-size: 1.3rem; font-weight: 600; }
+        header span { font-size: 0.85rem; opacity: 0.6; }
+
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+
+        h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #1a1a2e; }
+
+        /* Add Site Form */
+        .add-site-form {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.6rem 0.85rem;
+            border: 1px solid #dde1e7;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            color: #1a1a2e;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4f6ef7;
+            background: white;
+        }
+
+        button[type="submit"] {
+            margin-top: 1rem;
+            padding: 0.65rem 1.5rem;
+            background: #4f6ef7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button[type="submit"]:hover { background: #3a56d4; }
+
+        /* Site Cards */
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .site-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            transition: box-shadow 0.2s;
+        }
+
+        .site-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .site-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .site-meta {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        /* Progress Bar */
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.35rem;
+            color: #6b7280;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: #4f6ef7;
+            transition: width 0.4s ease;
+        }
+
+        .progress-fill.complete { background: #22c55e; }
+        .progress-fill.mid { background: #f59e0b; }
+
+        .site-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .btn-view {
+            font-size: 0.85rem;
+            padding: 0.45rem 1rem;
+            background: #f0f3ff;
+            color: #4f6ef7;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-view:hover { background: #e0e7ff; }
+
+        .sla-tag {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.7rem;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 99px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+
+        /* Delete form inline */
+        .delete-form { display: inline; }
+        .btn-delete {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.7rem;
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-delete:hover { background: #fecaca; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>EOL Migration Tracker</h1>
+    <span>Network Deployment Dashboard</span>
+</header>
+
+<div class="container">
+
+    <!-- Add Site Form -->
+    <div class="add-site-form">
+        <h2>Add New Site</h2>
+        <form action="/add-site" method="POST">
+            <div class="form-grid">
+                <input type="text" name="name" placeholder="Site Name" required>
+                <input type="text" name="location" placeholder="Location (City, State)">
+                <input type="text" name="milestone" placeholder="Current Milestone">
+                <input type="date" name="sla_date">
+            </div>
+            <button type="submit">+ Add Site</button>
+        </form>
+    </div>
+
+    <!-- Site Cards -->
+    <h2>All Sites</h2>
+
+    {% if sites %}
+    <div class="sites-grid">
+        {% for site in sites %}
+        {% set progress = site.progress() %}
+        <div class="site-card">
+            <h3>{{ site.name }}</h3>
+            <div class="site-meta">
+                📍 {{ site.location or 'No location set' }} &nbsp;|&nbsp;
+                🎯 {{ site.milestone or 'No milestone set' }}
+            </div>
+
+            <div class="progress-label">
+                <span>Deployment Progress</span>
+                <span>{{ progress }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill
+                    {% if progress == 100 %}complete
+                    {% elif progress >= 50 %}mid{% endif %}"
+                    style="width: {{ progress }}%">
+                </div>
+            </div>
+
+            <div class="site-footer">
+                <a href="/site/{{ site.id }}" class="btn-view">View Site →</a>
+                {% if site.sla_date %}
+                <span class="sla-tag">SLA: {{ site.sla_date }}</span>
+                {% endif %}
+                <form action="/site/{{ site.id }}/delete"
+                      method="POST" class="delete-form"
+                      onsubmit="return confirm('Delete this site and all its devices?')">
+                    <button type="submit" class="btn-delete">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        No sites added yet. Add your first site above to get started.
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>
