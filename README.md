@@ -64,6 +64,6 @@ eol-migration-tracker/
 
 ## Author
 
-Built by [Your Name] as part of a network deployment portfolio 
+Built by Kayla Clark as part of a network deployment portfolio 
 demonstrating real-world project tracking, SLA management, 
 and multi-site deployment coordination.
