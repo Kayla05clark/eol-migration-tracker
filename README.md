@@ -33,7 +33,7 @@ adherence, and cross-functional technician coordination.
 ## How to Run
 
 **1. Clone the repo:**
-git clone https://github.com/YOURUSERNAME/eol-migration-tracker.git
+git clone https://github.com/kayla05clark/eol-migration-tracker.git
 cd eol-migration-tracker
 
 **2. Create and activate virtual environment:**
